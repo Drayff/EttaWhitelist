@@ -2,3 +2,8 @@ name: EttaWhitelist
 version: '${project.version}'
 main: online.ettarp.ettawhitelist.EttaWhitelist
 api-version: '1.20'
+
+commands:
+  ewhitelist:
+    description: "Команда для добавления и удаление игроков из вайтлиста."
+    usage: /ewhitelist

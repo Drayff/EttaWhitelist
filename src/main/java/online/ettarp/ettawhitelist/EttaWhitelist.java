@@ -1,6 +1,10 @@
 package online.ettarp.ettawhitelist;
 
+import online.ettarp.ettawhitelist.commands.WhitelistCommand;
+import online.ettarp.ettawhitelist.commands.WhitelistCompleter;
 import online.ettarp.ettawhitelist.db.DBHandler;
+import online.ettarp.ettawhitelist.listeners.PreLoginEvent;
+import online.ettarp.ettawhitelist.runnable.WhitelistChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
@@ -20,6 +24,13 @@ public final class EttaWhitelist extends JavaPlugin {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        new WhitelistChecker(this).runTaskTimerAsynchronously(this, 0, 60*60*20);
+
+        getCommand("ewhitelist").setExecutor(new WhitelistCommand(this));
+        getCommand("ewhitelist").setTabCompleter(new WhitelistCompleter());
+
+        getServer().getPluginManager().registerEvents(new PreLoginEvent(this), this);
     }
 
     @Override
