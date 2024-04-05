@@ -18,12 +18,14 @@ public final class EttaWhitelist extends JavaPlugin {
         saveDefaultConfig();
         handler = new DBHandler(this);
 
-        try {
-            getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS `whitelist` (`nickname` varchar(255) NOT NULL, `date` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
-            getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS `season_whitelist` (`nickname` varchar(255) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS `whitelist` (`nickname` varchar(255) NOT NULL, `date` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+                getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS `season_whitelist` (`nickname` varchar(255) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         new WhitelistChecker(this).runTaskTimerAsynchronously(this, 0, 60*60*20);
 
