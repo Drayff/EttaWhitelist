@@ -53,49 +53,53 @@ public class WhitelistCommand implements CommandExecutor {
                         return true;
                     }
 
-                    try {
-                        PreparedStatement statement = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
-                        statement.setString(1, target);
-                        ResultSet seasonResult = statement.executeQuery();
+                    plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try {
+                            PreparedStatement statement = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
+                            statement.setString(1, target);
+                            ResultSet seasonResult = statement.executeQuery();
 
-                        if(seasonResult.next()) {
-                            player.sendMessage("Игрок уже есть в вайтлисте.");
-                            return true;
+                            if (seasonResult.next()) {
+                                player.sendMessage("Игрок уже есть в вайтлисте.");
+                                return;
+                            }
+
+                            statement = connection.prepareStatement("INSERT INTO season_whitelist (nickname) VALUES (?);");
+                            statement.setString(1, target);
+                            statement.execute();
+
+                            player.sendMessage("Игрок успешно добавлен в вайтлист.");
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
                         }
-
-                        statement = connection.prepareStatement("INSERT INTO season_whitelist (nickname) VALUES (?);");
-                        statement.setString(1, target);
-                        statement.execute();
-
-                        player.sendMessage("Игрок успешно добавлен в вайтлист.");
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
+                    });
                 } else if(args[1].equals("month")) {
                     if (args.length != 4) {
                         player.sendMessage("Использование: /ewhitelist add month <Target> <Month Count>.");
                         return true;
                     }
 
-                    try {
-                        PreparedStatement statement = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
-                        statement.setString(1, target);
-                        ResultSet monthResult = statement.executeQuery();
+                    plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try {
+                            PreparedStatement statement = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
+                            statement.setString(1, target);
+                            ResultSet monthResult = statement.executeQuery();
 
-                        if(monthResult.next()) {
-                            player.sendMessage("Игрок уже есть в вайтлисте.");
-                            return true;
+                            if (monthResult.next()) {
+                                player.sendMessage("Игрок уже есть в вайтлисте.");
+                                return;
+                            }
+
+                            statement = connection.prepareStatement("INSERT INTO whitelist (nickname, date) VALUES (?, ?);");
+                            statement.setString(1, target);
+                            statement.setDate(2, java.sql.Date.valueOf(LocalDate.now().plusDays(30L * Integer.parseInt(args[3]))));
+                            statement.execute();
+
+                            player.sendMessage("Игрок успешно добавлен в вайтлист.");
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
                         }
-
-                        statement = connection.prepareStatement("INSERT INTO whitelist (nickname, date) VALUES (?, ?);");
-                        statement.setString(1, target);
-                        statement.setDate(2, java.sql.Date.valueOf(LocalDate.now().plusDays(30L * Integer.parseInt(args[3]))));
-                        statement.execute();
-
-                        player.sendMessage("Игрок успешно добавлен в вайтлист.");
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
+                    });
                 } else {
                     player.sendMessage("Использование: /ewhitelist add [season, month] <Target> <Month Count>.");
                 }
@@ -109,40 +113,40 @@ public class WhitelistCommand implements CommandExecutor {
                 }
 
                 target = args[1];
+                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                    try {
+                        PreparedStatement season = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
+                        season.setString(1, target);
 
-                try {
-                    PreparedStatement season = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
-                    season.setString(1, target);
+                        PreparedStatement month = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
+                        month.setString(1, target);
 
-                    PreparedStatement month = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
-                    month.setString(1, target);
+                        ResultSet seasonResult = season.executeQuery();
+                        ResultSet monthResult = month.executeQuery();
 
-                    ResultSet seasonResult = season.executeQuery();
-                    ResultSet monthResult = month.executeQuery();
+                        PreparedStatement statement;
 
-                    PreparedStatement statement;
+                        if (seasonResult.next() || monthResult.next()) {
+                            statement = connection.prepareStatement("DELETE FROM season_whitelist WHERE nickname = ?");
+                            statement.setString(1, target);
+                            statement.execute();
 
-                    if(seasonResult.next() || monthResult.next()) {
-                        statement = connection.prepareStatement("DELETE FROM season_whitelist WHERE nickname = ?");
-                        statement.setString(1, target);
-                        statement.execute();
+                            statement = connection.prepareStatement("DELETE FROM whitelist WHERE nickname = ?");
+                            statement.setString(1, target);
+                            statement.execute();
 
-                        statement = connection.prepareStatement("DELETE FROM whitelist WHERE nickname = ?");
-                        statement.setString(1, target);
-                        statement.execute();
+                            if (plugin.getServer().getPlayer(target) != null) {
+                                plugin.getServer().getPlayer(target).kickPlayer(plugin.getConfig().getString("text.deleted-from-whitelist"));
+                            }
 
-                        if(plugin.getServer().getPlayer(target) != null) {
-                            plugin.getServer().getPlayer(target).kickPlayer(plugin.getConfig().getString("text.deleted-from-whitelist"));
+                            player.sendMessage("Игрок успешно удалён.");
+                        } else {
+                            player.sendMessage("Игрок не в вайтлисте.");
                         }
-
-                        player.sendMessage("Игрок успешно удалён.");
-                    } else {
-                        player.sendMessage("Игрок не в вайтлисте.");
-                        return true;
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                });
 
                 break;
         }
