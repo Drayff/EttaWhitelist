@@ -24,6 +24,10 @@ public class PreLoginEvent implements Listener {
     public void onPlayerConnect(AsyncPlayerPreLoginEvent event) {
         String target = event.getName();
 
+        if(plugin.getServer().getPlayer(target) != null) {
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, plugin.getConfig().getString("text.already-in-server"));
+        }
+
         try {
             PreparedStatement season = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
             season.setString(1, target);

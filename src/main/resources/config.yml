@@ -8,3 +8,4 @@ text:
   not-in-whitelist: "Вы не в вайтлисте!"
   deleted-from-whitelist: "Вы были удалены из вайтлиста!"
   is-over: "Ваша проходка закончилась!"
+  already-in-server: "Вы уже на сервере!"
