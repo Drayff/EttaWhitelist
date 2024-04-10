@@ -1,6 +1,7 @@
 package online.ettarp.ettawhitelist.commands;
 
 import online.ettarp.ettawhitelist.EttaWhitelist;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -133,9 +134,11 @@ public class WhitelistCommand implements CommandExecutor {
                             statement.setString(1, target);
                             statement.execute();
 
-                            if (plugin.getServer().getPlayer(target) != null) {
-                                plugin.getServer().getPlayer(target).kickPlayer(plugin.getConfig().getString("text.deleted-from-whitelist"));
-                            }
+                            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                                if (plugin.getServer().getPlayer(target) != null) {
+                                    plugin.getServer().getPlayer(target).kickPlayer(plugin.getConfig().getString("text.deleted-from-whitelist"));
+                                }
+                            });
 
                             sender.sendMessage("Игрок успешно удалён.");
                         } else {
