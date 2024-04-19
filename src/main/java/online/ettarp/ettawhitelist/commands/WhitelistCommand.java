@@ -112,14 +112,14 @@ public class WhitelistCommand implements CommandExecutor {
                         try {
                             PreparedStatement statement = connection.prepareStatement("SELECT * FROM endless_whitelist WHERE nickname = ?");
                             statement.setString(1, target);
-                            ResultSet monthResult = statement.executeQuery();
+                            ResultSet endlessResult = statement.executeQuery();
 
-                            if (monthResult.next()) {
+                            if (endlessResult.next()) {
                                 sender.sendMessage("Игрок уже есть в вайтлисте.");
                                 return;
                             }
 
-                            statement = connection.prepareStatement("INSERT INTO whitelist (nickname) VALUES (?);");
+                            statement = connection.prepareStatement("INSERT INTO endless_whitelist (nickname) VALUES (?);");
                             statement.setString(1, target);
                             statement.execute();
 
