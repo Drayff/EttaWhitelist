@@ -19,6 +19,7 @@ public class WhitelistCompleter implements TabCompleter {
             if(args[0].equals("add")) {
                 completions.add("season");
                 completions.add("month");
+                completions.add("endless");
             } else {
                 completions = null;
             }
