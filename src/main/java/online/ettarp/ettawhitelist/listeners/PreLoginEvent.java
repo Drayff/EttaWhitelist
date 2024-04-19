@@ -35,7 +35,7 @@ public class PreLoginEvent implements Listener {
             PreparedStatement month = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
             month.setString(1, target);
 
-            PreparedStatement endless = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
+            PreparedStatement endless = connection.prepareStatement("SELECT * FROM endless_whitelist WHERE nickname = ?");
             endless.setString(1, target);
 
             ResultSet seasonResult = season.executeQuery();
