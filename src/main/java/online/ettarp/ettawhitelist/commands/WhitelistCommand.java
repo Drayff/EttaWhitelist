@@ -46,90 +46,101 @@ public class WhitelistCommand implements CommandExecutor {
 
                 target = args[2];
 
-                if(args[1].equals("season")) {
-                    if (args.length != 3) {
-                        sender.sendMessage("Использование: /ewhitelist add season <Target>.");
-                        return true;
-                    }
-
-                    plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                        try {
-                            PreparedStatement statement = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
-                            statement.setString(1, target);
-                            ResultSet seasonResult = statement.executeQuery();
-
-                            if (seasonResult.next()) {
-                                sender.sendMessage("Игрок уже есть в вайтлисте.");
-                                return;
-                            }
-
-                            statement = connection.prepareStatement("INSERT INTO season_whitelist (nickname) VALUES (?);");
-                            statement.setString(1, target);
-                            statement.execute();
-
-                            sender.sendMessage("Игрок успешно добавлен в вайтлист.");
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                switch (args[1]) {
+                    case "season":
+                        if (args.length != 3) {
+                            sender.sendMessage("Использование: /ewhitelist add season <Target>.");
+                            return true;
                         }
-                    });
-                } else if(args[1].equals("month")) {
-                    if (args.length != 4) {
-                        sender.sendMessage("Использование: /ewhitelist add month <Target> <Month Count>.");
-                        return true;
-                    }
 
-                    plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                        try {
-                            PreparedStatement statement = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
-                            statement.setString(1, target);
-                            ResultSet monthResult = statement.executeQuery();
+                        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                PreparedStatement statement = connection.prepareStatement("SELECT * FROM season_whitelist WHERE nickname = ?");
+                                statement.setString(1, target);
+                                ResultSet seasonResult = statement.executeQuery();
 
-                            if (monthResult.next()) {
-                                PreparedStatement update = connection.prepareStatement("UPDATE whitelist SET date = ? WHERE nickname = ?");
-                                update.setString(1, target);
-                                update.setDate(2, java.sql.Date.valueOf(monthResult.getDate("date").toLocalDate().plusDays(30L * Integer.parseInt(args[3]))));
-                                sender.sendMessage("Подписка игрока успешно продлена.");
-                                return;
+                                if (seasonResult.next()) {
+                                    sender.sendMessage("Игрок уже есть в вайтлисте.");
+                                    return;
+                                }
+
+                                statement = connection.prepareStatement("INSERT INTO season_whitelist (nickname) VALUES (?);");
+                                statement.setString(1, target);
+                                statement.execute();
+
+                                statement.close();
+
+                                sender.sendMessage("Игрок успешно добавлен в вайтлист.");
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
                             }
-
-                            statement = connection.prepareStatement("INSERT INTO whitelist (nickname, date) VALUES (?, ?);");
-                            statement.setString(1, target);
-                            statement.setDate(2, java.sql.Date.valueOf(LocalDate.now().plusDays(30L * Integer.parseInt(args[3]))));
-                            statement.execute();
-
-                            sender.sendMessage("Игрок успешно добавлен в вайтлист.");
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                        });
+                        break;
+                    case "month":
+                        if (args.length != 4) {
+                            sender.sendMessage("Использование: /ewhitelist add month <Target> <Month Count>.");
+                            return true;
                         }
-                    });
-                } else if(args[1].equals("endless")) {
-                    if (args.length != 3) {
-                        sender.sendMessage("Использование: /ewhitelist add endless <Target>.");
-                        return true;
-                    }
 
-                    plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                        try {
-                            PreparedStatement statement = connection.prepareStatement("SELECT * FROM endless_whitelist WHERE nickname = ?");
-                            statement.setString(1, target);
-                            ResultSet endlessResult = statement.executeQuery();
+                        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                PreparedStatement statement = connection.prepareStatement("SELECT * FROM whitelist WHERE nickname = ?");
+                                statement.setString(1, target);
+                                ResultSet monthResult = statement.executeQuery();
 
-                            if (endlessResult.next()) {
-                                sender.sendMessage("Игрок уже есть в вайтлисте.");
-                                return;
+                                if (monthResult.next()) {
+                                    PreparedStatement update = connection.prepareStatement("UPDATE whitelist SET date = ? WHERE nickname = ?");
+                                    update.setString(1, target);
+                                    update.setDate(2, Date.valueOf(monthResult.getDate("date").toLocalDate().plusDays(30L * Integer.parseInt(args[3]))));
+                                    update.executeUpdate();
+                                    update.close();
+                                    sender.sendMessage("Подписка игрока успешно продлена.");
+                                    return;
+                                }
+
+                                statement = connection.prepareStatement("INSERT INTO whitelist (nickname, date) VALUES (?, ?);");
+                                statement.setString(1, target);
+                                statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(30L * Integer.parseInt(args[3]))));
+                                statement.execute();
+                                statement.close();
+
+                                sender.sendMessage("Игрок успешно добавлен в вайтлист.");
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
                             }
-
-                            statement = connection.prepareStatement("INSERT INTO endless_whitelist (nickname) VALUES (?);");
-                            statement.setString(1, target);
-                            statement.execute();
-
-                            sender.sendMessage("Игрок успешно добавлен в вайтлист.");
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                        });
+                        break;
+                    case "endless":
+                        if (args.length != 3) {
+                            sender.sendMessage("Использование: /ewhitelist add endless <Target>.");
+                            return true;
                         }
-                    });
-                } else {
-                    sender.sendMessage("Использование: /ewhitelist add [season, month] <Target> <Month Count>.");
+
+                        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                PreparedStatement statement = connection.prepareStatement("SELECT * FROM endless_whitelist WHERE nickname = ?");
+                                statement.setString(1, target);
+                                ResultSet endlessResult = statement.executeQuery();
+
+                                if (endlessResult.next()) {
+                                    sender.sendMessage("Игрок уже есть в вайтлисте.");
+                                    return;
+                                }
+
+                                statement = connection.prepareStatement("INSERT INTO endless_whitelist (nickname) VALUES (?);");
+                                statement.setString(1, target);
+                                statement.execute();
+                                statement.close();
+
+                                sender.sendMessage("Игрок успешно добавлен в вайтлист.");
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                        break;
+                    default:
+                        sender.sendMessage("Использование: /ewhitelist add [season, month] <Target> <Month Count>.");
+                        break;
                 }
 
                 break;
@@ -176,6 +187,8 @@ public class WhitelistCommand implements CommandExecutor {
                                     plugin.getServer().getPlayer(target).kickPlayer(plugin.getConfig().getString("text.deleted-from-whitelist"));
                                 }
                             });
+
+                            statement.close();
 
                             sender.sendMessage("Игрок успешно удалён.");
                         } else {
