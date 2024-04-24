@@ -1,10 +1,11 @@
 package online.ettarp.ettawhitelist.runnable;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.util.DiscordUtil;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import online.ettarp.ettawhitelist.EttaWhitelist;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

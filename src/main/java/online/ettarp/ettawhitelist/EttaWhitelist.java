@@ -1,8 +1,8 @@
 package online.ettarp.ettawhitelist;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
-import net.dv8tion.jda.api.entities.TextChannel;
 import online.ettarp.ettawhitelist.commands.WhitelistCommand;
 import online.ettarp.ettawhitelist.commands.WhitelistCompleter;
 import online.ettarp.ettawhitelist.db.DBHandler;

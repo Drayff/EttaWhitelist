@@ -33,14 +33,14 @@ public class WhitelistCommand implements CommandExecutor {
         String target;
 
         if (args == null || args.length == 0) {
-            sender.sendMessage("Использование: /ewhitelist [add, remove] [season, month] <Target> <Month Count>.");
+            sender.sendMessage("Использование: /ewhitelist [add, remove] [season, month, endless] <Target> <Month Count>.");
             return true;
         }
 
         switch (args[0]) {
             case "add":
                 if (args.length < 2) {
-                    sender.sendMessage("Использование: /ewhitelist add [season, month] <Target> <Month Count>.");
+                    sender.sendMessage("Использование: /ewhitelist add [season, month, endless] <Target> <Month Count>.");
                     return true;
                 }
 
@@ -63,6 +63,8 @@ public class WhitelistCommand implements CommandExecutor {
                                     sender.sendMessage("Игрок уже есть в вайтлисте.");
                                     return;
                                 }
+
+                                connection.createStatement().execute("DELETE * FROM whitelist WHERE nickname = " + target);
 
                                 statement = connection.prepareStatement("INSERT INTO season_whitelist (nickname) VALUES (?);");
                                 statement.setString(1, target);
@@ -127,6 +129,8 @@ public class WhitelistCommand implements CommandExecutor {
                                     return;
                                 }
 
+                                connection.createStatement().execute("DELETE * FROM whitelist WHERE nickname = " + target);
+
                                 statement = connection.prepareStatement("INSERT INTO endless_whitelist (nickname) VALUES (?);");
                                 statement.setString(1, target);
                                 statement.execute();
@@ -139,7 +143,7 @@ public class WhitelistCommand implements CommandExecutor {
                         });
                         break;
                     default:
-                        sender.sendMessage("Использование: /ewhitelist add [season, month] <Target> <Month Count>.");
+                        sender.sendMessage("Использование: /ewhitelist add [season, month, endless] <Target> <Month Count>.");
                         break;
                 }
 
