@@ -4,7 +4,12 @@ db:
   password: "drayff"
   database: "etta"
 
+discord:
+  notification-channel: '1021715708356337705' # some ciferki
+
+
 text:
+
   not-in-whitelist: "Вы не в вайтлисте!"
   deleted-from-whitelist: "Вы были удалены из вайтлиста!"
   is-over: "Ваша проходка закончилась!"
