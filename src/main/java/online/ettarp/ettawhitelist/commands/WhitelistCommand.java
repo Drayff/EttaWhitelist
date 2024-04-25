@@ -70,8 +70,6 @@ public class WhitelistCommand implements CommandExecutor {
                                 statement.setString(1, target);
                                 statement.execute();
 
-                                statement.close();
-
                                 sender.sendMessage("Игрок успешно добавлен в вайтлист.");
                             } catch (SQLException e) {
                                 throw new RuntimeException(e);
@@ -95,7 +93,6 @@ public class WhitelistCommand implements CommandExecutor {
                                     update.setString(1, target);
                                     update.setDate(2, Date.valueOf(monthResult.getDate("date").toLocalDate().plusDays(30L * Integer.parseInt(args[3]))));
                                     update.executeUpdate();
-                                    update.close();
                                     sender.sendMessage("Подписка игрока успешно продлена.");
                                     return;
                                 }
@@ -104,7 +101,6 @@ public class WhitelistCommand implements CommandExecutor {
                                 statement.setString(1, target);
                                 statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(30L * Integer.parseInt(args[3]))));
                                 statement.execute();
-                                statement.close();
 
                                 sender.sendMessage("Игрок успешно добавлен в вайтлист.");
                             } catch (SQLException e) {
@@ -134,7 +130,6 @@ public class WhitelistCommand implements CommandExecutor {
                                 statement = connection.prepareStatement("INSERT INTO endless_whitelist (nickname) VALUES (?);");
                                 statement.setString(1, target);
                                 statement.execute();
-                                statement.close();
 
                                 sender.sendMessage("Игрок успешно добавлен в вайтлист.");
                             } catch (SQLException e) {
@@ -191,8 +186,6 @@ public class WhitelistCommand implements CommandExecutor {
                                     plugin.getServer().getPlayer(target).kickPlayer(plugin.getConfig().getString("text.deleted-from-whitelist"));
                                 }
                             });
-
-                            statement.close();
 
                             sender.sendMessage("Игрок успешно удалён.");
                         } else {

@@ -39,31 +39,34 @@ public class WhitelistChecker extends BukkitRunnable {
 
             while (resultSet.next()) {
                 Player target = plugin.getServer().getPlayer(resultSet.getString("nickname"));
-                OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("uuid")));
                 LocalDate date = resultSet.getDate("date").toLocalDate();
 
                 long daysDifference = ChronoUnit.DAYS.between(LocalDate.now(), date);
                 long absDaysDifference = Math.abs(daysDifference);
 
-                User user = DiscordUtil.getUserById(DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(UUID.fromString(resultSet.getString("uuid"))));
-                String userAsTag = String.format("<@%s>", user.getId());
+                if(resultSet.getString("uuid") != null) {
 
-                if(absDaysDifference == 7) {
-                    plugin.getNotificationChannel().sendMessageEmbeds(
-                            buildEmbed(absDaysDifference, offlineTarget)
-                    ).content(userAsTag).queue();
-                }
+                    OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("uuid")));
 
-                if(absDaysDifference == 3) {
-                    plugin.getNotificationChannel().sendMessageEmbeds(
-                            buildEmbed(absDaysDifference, offlineTarget)
-                    ).content(userAsTag).queue();
-                }
+                    User user = DiscordUtil.getUserById(DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(UUID.fromString(resultSet.getString("uuid"))));
+                    String userAsTag = String.format("<@%s>", user.getId());
+                    if(absDaysDifference == 7) {
+                        plugin.getNotificationChannel().sendMessageEmbeds(
+                                buildEmbed(absDaysDifference, offlineTarget)
+                        ).content(userAsTag).queue();
+                    }
 
-                if(absDaysDifference == 1) {
-                    plugin.getNotificationChannel().sendMessageEmbeds(
-                            buildEmbed(absDaysDifference, offlineTarget)
-                    ).content(userAsTag).queue();
+                    if(absDaysDifference == 3) {
+                        plugin.getNotificationChannel().sendMessageEmbeds(
+                                buildEmbed(absDaysDifference, offlineTarget)
+                        ).content(userAsTag).queue();
+                    }
+
+                    if(absDaysDifference == 1) {
+                        plugin.getNotificationChannel().sendMessageEmbeds(
+                                buildEmbed(absDaysDifference, offlineTarget)
+                        ).content(userAsTag).queue();
+                    }
                 }
 
                 if(LocalDate.now().isAfter(date)) {
