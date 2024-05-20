@@ -64,7 +64,10 @@ public class WhitelistCommand implements CommandExecutor {
                                     return;
                                 }
 
-                                connection.createStatement().execute("DELETE FROM whitelist WHERE nickname = " + target);
+                                PreparedStatement deletionStatement = connection.prepareStatement("DELETE FROM whitelist WHERE nickname = ?");
+                                deletionStatement.setString(1, target);
+                                deletionStatement.executeUpdate();
+                                deletionStatement.close();
 
                                 statement = connection.prepareStatement("INSERT INTO season_whitelist (nickname) VALUES (?);");
                                 statement.setString(1, target);
@@ -125,7 +128,7 @@ public class WhitelistCommand implements CommandExecutor {
                                     return;
                                 }
 
-                                connection.createStatement().execute("DELETE FROM whitelist WHERE nickname = " + target);
+                                connection.createStatement().execute("DELETE * FROM whitelist WHERE nickname = " + target);
 
                                 statement = connection.prepareStatement("INSERT INTO endless_whitelist (nickname) VALUES (?);");
                                 statement.setString(1, target);
