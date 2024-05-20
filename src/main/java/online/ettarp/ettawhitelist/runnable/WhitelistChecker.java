@@ -3,16 +3,20 @@ package online.ettarp.ettawhitelist.runnable;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import online.ettarp.ettawhitelist.EttaWhitelist;
+import online.ettarp.ettawhitelist.db.NotifiedUserManager;
+import online.ettarp.ettawhitelist.models.NotifiedUser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -20,10 +24,11 @@ import java.util.UUID;
 public class WhitelistChecker extends BukkitRunnable {
     private final EttaWhitelist plugin;
     private final Connection connection;
+    private final NotifiedUserManager nUM;
 
     public WhitelistChecker(EttaWhitelist plugin) {
         this.plugin = plugin;
-
+        this.nUM = plugin.getNUM();
         try {
             connection = plugin.getConnection();
         } catch (SQLException e) {
@@ -49,23 +54,34 @@ public class WhitelistChecker extends BukkitRunnable {
                     OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("uuid")));
 
                     User user = DiscordUtil.getUserById(DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(UUID.fromString(resultSet.getString("uuid"))));
+                    NotifiedUser notifiedUser = nUM.getNotifiedUser(resultSet.getString("uuid"));
+
+                    if (user == null) return;
+
+                    if(notifiedUser == null) {
+                        notifiedUser = new NotifiedUser(resultSet.getString("uuid"), false, false, false);
+                    }
+
                     String userAsTag = String.format("<@%s>", user.getId());
-                    if(absDaysDifference == 7) {
+                    if(absDaysDifference == 7 && !notifiedUser.getWeeklyNotified()) {
                         plugin.getNotificationChannel().sendMessageEmbeds(
                                 buildEmbed(absDaysDifference, offlineTarget)
                         ).content(userAsTag).queue();
+                        notifiedUser.setWeeklyNotified(true);
                     }
 
-                    if(absDaysDifference == 3) {
+                    if(absDaysDifference == 3 && !notifiedUser.getThreeDaysNotified()) {
                         plugin.getNotificationChannel().sendMessageEmbeds(
                                 buildEmbed(absDaysDifference, offlineTarget)
                         ).content(userAsTag).queue();
+                        notifiedUser.setThreeDaysNotified(true);
                     }
 
-                    if(absDaysDifference == 1) {
+                    if(absDaysDifference == 1 && !notifiedUser.getOneDayNotified()) {
                         plugin.getNotificationChannel().sendMessageEmbeds(
                                 buildEmbed(absDaysDifference, offlineTarget)
                         ).content(userAsTag).queue();
+                        notifiedUser.setOneDayNotified(true);
                     }
                 }
 
